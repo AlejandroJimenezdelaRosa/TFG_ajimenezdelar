@@ -1,0 +1,9 @@
+# Archivos temporales de ejecución y guardado
+tempCodeRunnerFile.py
+savegame.json
+__pycache__/
+*.pyc
+
+# Entornos virtuales
+venv/
+.venv/
