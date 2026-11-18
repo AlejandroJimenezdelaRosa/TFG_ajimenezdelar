@@ -48,8 +48,49 @@ class Capitulo1:
         # JUGADOR
         # ========
         self.jugador = pygame.Rect(624, 336, 32, 48)
+        self.sprite_frente = pygame.image.load(
+            "game/ui/assets/personajes/protagonista/frente.png"
+        ).convert_alpha()
+
+        self.sprite_espalda = pygame.image.load(
+            "game/ui/assets/personajes/protagonista/espalda.png"
+        ).convert_alpha()
+
+        self.sprite_izquierda = pygame.image.load(
+            "game/ui/assets/personajes/protagonista/izquierda.png"
+        ).convert_alpha()
+
+        self.sprite_derecha = pygame.image.load(
+            "game/ui/assets/personajes/protagonista/derecha.png"
+        ).convert_alpha()
+
         self.vel = 4
         self.post_combate = False
+
+        #Escalado de sprites
+        tam = (100, 132)
+
+        self.sprite_frente = pygame.transform.scale(
+            self.sprite_frente,
+            tam
+        )
+
+        self.sprite_espalda = pygame.transform.scale(
+            self.sprite_espalda,
+            tam
+        )
+
+        self.sprite_izquierda = pygame.transform.scale(
+            self.sprite_izquierda,
+            tam
+        )
+
+        self.sprite_derecha = pygame.transform.scale(
+            self.sprite_derecha,
+            tam
+        )
+
+        self.sprite_actual = self.sprite_frente
 
         # ============================
         # POSICIONES DE LAS COLISIONES
@@ -147,27 +188,27 @@ class Capitulo1:
     def iniciar_tutorial(self):
         self.mostrando_opciones_tutorial = False
 
-        self.partida.narrar("El objetivo es emborrachar al rival antes de que él te emborrache a ti.")
-        self.partida.narrar("Cada ataque sube la borrachera del rival.")
+        self.partida.narrar("El objetivo es emborrachar al rival antes de que él te emborrache a ti. Sino estás perdido (Literalmente).")
+        self.partida.narrar("Cada ataque obliga al rival a consumir alcohol y sube la barra de Puntos de Alcohol del rival.")
         self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
 
         self.partida.narrar("TIPOS DE CARTAS")
-        self.partida.narrar("• ATAQUE → suben borrachera al rival")
-        self.partida.narrar("• DEFENSA / CURACIÓN → bajan tu borrachera")
-        self.partida.narrar("• ACCIÓN → efectos especiales (robar, esquivar, etc.)")
-        self.partida.narrar("• SET → si juntas 3 iguales, activas un COMBO")
+        self.partida.narrar("ATAQUE → suben barra de Puntos de Alcohol al rival")
+        self.partida.narrar("DEFENSA / CURACIÓN → bajan tu barra de Puntos de Alcohol o evitan recibir daño")
+        self.partida.narrar("ACCIÓN → efectos especiales (robar, esquivar, etc.)")
+        self.partida.narrar("SET → si juntas 3 iguales, activas un COMBO")
         self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
 
         self.partida.narrar("ESTADOS")
-        self.partida.narrar("• Sobrio (0–40%) → normal")
-        self.partida.narrar("• Contentillo (40–70%) → +daño, -precisión")
-        self.partida.narrar("• Tocado (70–90%) → +daño recibido, -precisión")
-        self.partida.narrar("• Ciego (90–100%) → ataques torpes, riesgo de autoataque")
+        self.partida.narrar("Sobrio (0–40%) → normal")
+        self.partida.narrar("Contentillo (40–70%) → +daño, -precisión")
+        self.partida.narrar("Tocado (70–90%) → +daño recibido, -precisión")
+        self.partida.narrar("Ciego (90–100%) → ataques torpes, riesgo de autoataque")
         self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
 
         self.partida.narrar("PRECISIÓN Y CRÍTICOS")
         self.partida.narrar("Tus ataques pueden fallar según tu estado.")
-        self.partida.narrar("También pueden ser críticos y hacer más daño.")
+        self.partida.narrar("También pueden ser críticos y hacer más daño o provocar autoataques.")
         self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
 
         self.partida.narrar("COMBOS")
@@ -201,12 +242,19 @@ class Capitulo1:
         if not self.mostrando_opciones_tutorial and not self.mostrando_opciones_fin_tutorial:
             if keys[pygame.K_w]:
                 self.jugador.y -= self.vel
+                self.sprite_actual = self.sprite_espalda
+
             if keys[pygame.K_s]:
                 self.jugador.y += self.vel
+                self.sprite_actual = self.sprite_frente
+
             if keys[pygame.K_a]:
                 self.jugador.x -= self.vel
+                self.sprite_actual = self.sprite_izquierda
+
             if keys[pygame.K_d]:
                 self.jugador.x += self.vel
+                self.sprite_actual = self.sprite_derecha
 
         # Colisiones
         for col in self.colisiones:
@@ -215,7 +263,7 @@ class Capitulo1:
                 break
 
         # Dibujar jugador
-        pygame.draw.rect(window, (255, 255, 0), self.jugador)
+        window.blit(self.sprite_actual,(self.jugador.x,self.jugador.y))
 
         # ============================================================
         # INTERACCIÓN CON LA MESA 4
