@@ -16,7 +16,7 @@ class Capitulo1:
             (1280, 720)
         )
 
-        self.trigger_mesa4 = pygame.Rect(800,400,105,80)
+        self.trigger_mesa4 = pygame.Rect(760,360,170,150)
 
         # ========
         # PARTIDA
@@ -68,7 +68,7 @@ class Capitulo1:
         self.post_combate = False
 
         #Escalado de sprites
-        tam = (100, 132)
+        tam = (105, 137)
 
         self.sprite_frente = pygame.transform.scale(
             self.sprite_frente,
@@ -124,6 +124,9 @@ class Capitulo1:
 
             # Mesa inferior central
             pygame.Rect(800,570,110,70),
+
+            # Mesa 4
+            pygame.Rect(790,410,120,80),
         ]
         
         # Icono del diálogo con la E 
@@ -263,8 +266,22 @@ class Capitulo1:
                 break
 
         # Dibujar jugador
-        window.blit(self.sprite_actual,(self.jugador.x,self.jugador.y))
+        sprite_x = (
+            self.jugador.centerx
+            - self.sprite_actual.get_width() // 2
+        )
 
+        sprite_y = (
+            self.jugador.bottom
+            - self.sprite_actual.get_height()
+        )
+
+        window.blit(
+            self.sprite_actual,
+            (sprite_x, sprite_y)
+        )
+        #pygame.draw.rect(window,(255, 0, 0),self.jugador,2) determinar las colisiones con la imagen nueva
+ 
         # ============================================================
         # INTERACCIÓN CON LA MESA 4
         # ============================================================
@@ -273,7 +290,7 @@ class Capitulo1:
             brillo.fill((255, 255, 0, 80))
             window.blit(brillo, (self.trigger_mesa4.x, self.trigger_mesa4.y))
 
-            if self.distancia(self.jugador, self.trigger_mesa4) < 70:
+            if self.jugador.colliderect(self.trigger_mesa4):
                 alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
                 icono = self.icono_e.copy()
                 icono.set_alpha(alpha)
