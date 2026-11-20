@@ -286,10 +286,6 @@ class Capitulo1:
         # INTERACCIÓN CON LA MESA 4
         # ============================================================
         if self.esperando_mesa4 and not self.mesa4_activada:
-            brillo = pygame.Surface((self.trigger_mesa4.w, self.trigger_mesa4.h), pygame.SRCALPHA)
-            brillo.fill((255, 255, 0, 80))
-            window.blit(brillo, (self.trigger_mesa4.x, self.trigger_mesa4.y))
-
             if self.jugador.colliderect(self.trigger_mesa4):
                 alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
                 icono = self.icono_e.copy()
