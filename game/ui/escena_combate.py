@@ -110,6 +110,8 @@ class EscenaCombate:
 
         self.video_vs = VideoFileClip("game/ui/assets/videos/vs_intro.mp4")
         self.video_time = 0
+        self.video_derrota = None
+        self.estado_post_derrota = False
         self.video_duration = self.video_vs.duration * 1000
         self.video_fps = self.video_vs.fps
 
@@ -149,6 +151,27 @@ class EscenaCombate:
         frame = self.video_vs.get_frame(self.video_time / 1000.0)
         frame_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
         frame_surface = pygame.transform.scale(frame_surface, (self.ancho, self.alto))
+        window.blit(frame_surface, (0, 0))
+
+    def reproducir_video_derrota(self, window, dt):
+        self.video_time += dt
+        if self.video_time >= self.video_derrota.duration * 1000:
+            self.video_derrota.close()
+            self.estado = "derrota_finalizada"
+            return
+
+        frame = self.video_derrota.get_frame(
+            self.video_time / 1000.0
+        )
+
+        frame_surface = pygame.surfarray.make_surface(
+            frame.swapaxes(0, 1)
+        )
+
+        frame_surface = pygame.transform.scale(
+            frame_surface,
+            (self.ancho, self.alto)
+        )
         window.blit(frame_surface, (0, 0))
 
     def fade_in_pre_video(self, window, dt):
@@ -635,7 +658,7 @@ class EscenaCombate:
             if self.partida.resultado == "victoria":
                 self.iniciar_texto_accion("¡Victoria! Has dejado KO al rival.")
             else:
-                self.iniciar_texto_accion("Derrota... Te has pasado de borrachera.")
+                self.iniciar_texto_accion("Derrota... Te has pasado con el alcohol.")
 
             # Frase personalizada del rival
             frase = getattr(self.rival, "frase_derrota", None) if self.partida.resultado == "victoria" else getattr(self.rival, "frase_victoria", None)
@@ -643,7 +666,18 @@ class EscenaCombate:
                 self.iniciar_texto_accion(frase)
 
             # Activar estado final
-            self.estado = "fin"
+            if self.partida.resultado == "derrota":
+                self.texto_accion_completo = ""
+                self.texto_accion_visible = ""
+                self.texto_accion_alpha = 0
+                self.video_derrota = VideoFileClip(
+                    "game/ui/assets/videos/derrota.mp4"
+                )
+                self.video_time = 0
+                self.estado = "video_derrota"
+            else:
+                self.estado = "fin"
+
             self._fin_timestamp = pygame.time.get_ticks()
             return
 
@@ -714,7 +748,7 @@ class EscenaCombate:
             if self.partida.resultado == "victoria":
                 self.iniciar_texto_accion("¡Victoria! Has dejado KO al rival.")
             else:
-                self.iniciar_texto_accion("Derrota... Te has pasado de borrachera.")
+                self.iniciar_texto_accion("Derrota... Te has pasado con el alcohol.")
 
             # Frase personalizada del rival
             frase = getattr(self.rival, "frase_derrota", None) if self.partida.resultado == "victoria" else getattr(self.rival, "frase_victoria", None)
@@ -722,7 +756,18 @@ class EscenaCombate:
                 self.iniciar_texto_accion(frase)
 
             # Activar estado final
-            self.estado = "fin"
+            if self.partida.resultado == "derrota":
+                self.texto_accion_completo = ""
+                self.texto_accion_visible = ""
+                self.texto_accion_alpha = 0
+                self.video_derrota = VideoFileClip(
+                    "game/ui/assets/videos/derrota.mp4"
+                )
+                self.video_time = 0
+                self.estado = "video_derrota"
+            else:
+                self.estado = "fin"
+
             self._fin_timestamp = pygame.time.get_ticks()
             return
 
@@ -792,6 +837,13 @@ class EscenaCombate:
             self.fade_out_post_video(window, dt)
             return
 
+        if self.estado == "video_derrota":
+            self.reproducir_video_derrota(window, dt)
+            return None
+
+        if self.estado == "derrota_finalizada":
+            return "derrota"
+        
         # ================================
         # SISTEMA NORMAL DEL COMBATE
         # =================================
@@ -925,24 +977,26 @@ class EscenaCombate:
         # Contenido del panel
         lineas = [
             "COMBINACIONES:",
-            "- SET COMPLETO (4 licores distintos): Cubata Legendario (+40-60 borrachera)",
-            "- TRÍO (3 iguales): Borrachera Táctica (robas 1, rival pierde 1, +25-30 borrachera)",
-            "- PAREJA (2 iguales): Doble Chupito (robas 1, rival pierde 1, +18 borrachera)",
+            "- SET COMPLETO (4 licores distintos): Cubata Legendario (+40-60 Puntos de Alcohol)",
+            "- TRÍO (3 iguales): Puntos de Alcohol Tácticos (robas 1, rival pierde 1, +25-30 Puntos de Alcohol)",
+            "- PAREJA (2 iguales): Doble Chupito (robas 1, rival pierde 1, +18 Puntos de Alcohol)",
             "",
             "SINERGIAS:",
-            "- Vermut + Ataque: +10 borrachera",
-            "- Orujo + Ataque Fuerte: +15 borrachera",
-            "- Pacharán + Defensa: +10 escudo",
-            "- Anís + Evento: +5 borrachera",
-            "- 3 licores distintos: +30 borrachera",
+            "- Vermut + Carta de Ataque: +10 Puntos de Alcohol",
+            "- Orujo + Carta de Ataque Fuerte: +15 Puntos de Alcohol",
+            "- Pacharán + Carta de Defensa: +10 Puntos de Alcohol",
             "",
             "TIPOS DE CARTA:",
-            "- ATAQUE: aumenta borrachera del rival",
+            "- ATAQUE: aumenta Puntos de Alcohol del rival",
             "- DEFENSA: añade escudo",
             "- ACCIÓN: efectos especiales",
             "- EVENTO: efectos globales o aleatorios",
             "",
-            "Pulsa ESC para volver"
+            "CONTROLES BÁSICOS:",
+            "- ZOOM: click derecho o SHIFT sobre la carta para hacer zoom",
+            "- CANCELAR CARTA JUGABLE: pulsar ESC mientras la carta está elevada para bajarla",
+            "- PASAR TURNO: pulsar ESC cuando no hay cartas elevadas para pasar turno y robar 1 carta",
+            "Pulsa el botón ? nuevamente para volver"
         ]
 
         # Crear superficie interna para scroll

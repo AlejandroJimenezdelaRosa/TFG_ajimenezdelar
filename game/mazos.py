@@ -140,7 +140,7 @@ def ataque_con_precision(usuario, rival, partida, base, tipo="normal", ignora_es
     elif estado == "ciego" and random.random() < 0.18:
         daño = int(daño * 1.5)
         usuario.borracha += 5
-        resumen.append("Golpe descontrolado (+50% daño, +5 borrachera).")
+        resumen.append("Golpe descontrolado (+50% daño, +5 Puntos de Alcohol).")
 
     # ===========================
     # 8. Efectos por tipo
@@ -153,7 +153,7 @@ def ataque_con_precision(usuario, rival, partida, base, tipo="normal", ignora_es
     if tipo == "fuerte":
         if random.random() < 0.10:
             usuario.borracha += 5
-            resumen.append("Tropiezas (+5 borrachera).")
+            resumen.append("Tropiezas (+5 Puntos de Alcohol).")
         if random.random() < 0.10:
             daño += 20
             resumen.append("¡GOLPE CRÍTICO! (+20).")
@@ -171,7 +171,7 @@ def ataque_con_precision(usuario, rival, partida, base, tipo="normal", ignora_es
     # 10. Aplicar daño final
     # ==========================
     rival.borracha += daño
-    resumen.append(f"Daño final aplicado: +{daño} borrachera.")
+    resumen.append(f"Daño final aplicado: +{daño} Puntos de Alcohol.")
 
     # ==============================
     # 11. Crítico por borrachera
@@ -206,10 +206,10 @@ def efecto_ataque(base, tipo="normal", ignora_escudo=False):
 # ==================================
 def evento_del_bar(partida, jugador, rival):
     eventos = [
-        ("La música sube", "musica", "Tu borrachera baja 5 puntos y recuperas precisión"),
-        ("El camarero te anima", "camarero", "Ganas +5 borrachera"),
+        ("La música sube", "musica", "Tus Puntos de Alcohol bajan 5 puntos y recuperas precisión"),
+        ("El camarero te anima", "camarero", "Ganas +5 Puntos de Alcohol"),
         ("Se apagan las luces", "luces", "Tu precisión baja (fallo forzado 35%)"),
-        ("Un borracho te empuja", "empujon", "Ganas +10 borrachera"),
+        ("Un borracho te empuja", "empujon", "Ganas +10 Puntos de Alcohol"),
         ("Llega la policía", "policia", "Pierdes el turno"),
     ]
 
@@ -253,7 +253,7 @@ def brindis_mortal(usuario, rival, partida):
 
     partida.narrar(
         f"{usuario.nombre} propone un BRINDIS MORTAL.\n"
-        f"{rival.nombre} recibe +{daño} borrachera."
+        f"{rival.nombre} recibe +{daño} Puntos de Alcohol."
     )
 
 def chupito_infernal(usuario, rival, partida):
@@ -262,8 +262,8 @@ def chupito_infernal(usuario, rival, partida):
 
     partida.narrar(
         f"{usuario.nombre} bebe un CHUPITO INFERNAL.\n"
-        f"{rival.nombre} recibe +30 borrachera.\n"
-        f"{usuario.nombre} recibe +10 borrachera."
+        f"{rival.nombre} recibe +30 Puntos de Alcohol.\n"
+        f"{usuario.nombre} recibe +10 Puntos de Alcohol."
     )
 
 # ==============================
@@ -276,7 +276,7 @@ def curacion(usuario, rival, partida):
 
     partida.narrar(
         f"{usuario.nombre} se refresca la cara.\n"
-        f"Recupera {recuperado} borrachera."
+        f"Recupera {recuperado} Puntos de Alcohol."
     )
 
 def agua_del_tiempo(usuario, rival, partida):
@@ -286,7 +286,7 @@ def agua_del_tiempo(usuario, rival, partida):
 
     partida.narrar(
         f"{usuario.nombre} bebe Agua del Tiempo.\n"
-        f"Recupera 20 borrachera y gana precisión temporal."
+        f"Recupera 20 Puntos de Alcohol y gana precisión temporal."
     )
 
 def salir_a_fumar(usuario, rival, partida):
@@ -296,7 +296,7 @@ def salir_a_fumar(usuario, rival, partida):
 
     partida.narrar(
         f"{usuario.nombre} sale a despejarse.\n"
-        f"Evita daño este turno, roba 1 carta y recupera 10 borrachera."
+        f"Evita daño este turno, roba 1 carta y recupera 10 Puntos de Alcohol."
     )
 
     usuario.robar(partida.mazo_central, 1, activar_eventos=False, partida=partida)
@@ -319,7 +319,7 @@ def defensa_reducir(usuario, rival, partida):
 
     partida.narrar(
         f"{usuario.nombre} se estabiliza.\n"
-        f"Pierde {recuperado} borrachera."
+        f"Pierde {recuperado} Puntos de Alcohol."
     )
 
 # ==============
@@ -335,7 +335,7 @@ def chupito_fuego(usuario, rival, partida):
     partida.narrar(
         f"Chupito de Fuego para {usuario.nombre}.\n"
         f"Estado: {estado}.\n"
-        f"Recibe +{daño} borrachera."
+        f"Recibe +{daño} Puntos de Alcohol."
     )
 
 def ruleta_del_bar(usuario, rival, partida):
@@ -354,11 +354,11 @@ def ruleta_del_bar(usuario, rival, partida):
         valor = int(efecto[1:])
         objetivo = rival if rival else usuario
         objetivo.borracha += valor
-        mensaje.append(f"{objetivo.nombre} recibe +{valor} borrachera.")
+        mensaje.append(f"{objetivo.nombre} recibe +{valor} Puntos de Alcohol.")
     elif efecto.startswith("-"):
         valor = int(efecto[1:])
         usuario.borracha = max(0, usuario.borracha - valor)
-        mensaje.append(f"{usuario.nombre} pierde {valor} borrachera.")
+        mensaje.append(f"{usuario.nombre} pierde {valor} Puntos de Alcohol.")
     elif efecto == "robar1":
         usuario.robar(partida.mazo_central, 1, activar_eventos=False, partida=partida)
         mensaje.append("Robas 1 carta.")
@@ -386,7 +386,7 @@ def ruleta_del_bar(usuario, rival, partida):
         usuario.borracha += 15
         if rival:
             rival.borracha += 15
-        mensaje.append("¡Explosión! Ambos reciben +15 borrachera.")
+        mensaje.append("¡Explosión! Ambos reciben +15 Puntos de Alcohol.")
     partida.narrar("\n".join(mensaje))
 
 def explosion_botellines(usuario, rival, partida):
@@ -397,7 +397,7 @@ def explosion_botellines(usuario, rival, partida):
 
     partida.narrar(
         f"¡Explosión de botellines!\n"
-        f"Ambos reciben +{daño} borrachera."
+        f"Ambos reciben +{daño} Puntos de Alcohol."
     )
 
 # =======================================
@@ -414,7 +414,7 @@ def crear_mazo_unico():
 
     # Acciones de curación y defensa
     for _ in range(4):
-        mazo.append(Carta("Curación", "accion", "Recuperas 25 borrachera", curacion))
+        mazo.append(Carta("Curación", "accion", "Recuperas 25 Puntos de Alcohol", curacion))
 
     for _ in range(3):
         mazo.append(Carta("Agua del Tiempo", "accion", "Cura 20 y da precisión", agua_del_tiempo))
@@ -427,13 +427,13 @@ def crear_mazo_unico():
 
     # Ataques 
     for _ in range(5):
-        mazo.append(Carta("Ataque Suave", "ataque", "+10 borrachera", efecto_ataque(10, "suave")))
+        mazo.append(Carta("Ataque Suave", "ataque", "+10 Puntos de Alcohol", efecto_ataque(10, "suave")))
 
     for _ in range(5):
-        mazo.append(Carta("Ataque Medio", "ataque", "+15 borrachera", efecto_ataque(15, "medio")))
+        mazo.append(Carta("Ataque Medio", "ataque", "+15 Puntos de Alcohol", efecto_ataque(15, "medio")))
 
     for _ in range(4):
-        mazo.append(Carta("Ataque Fuerte", "ataque", "+20 borrachera + efectos", efecto_ataque(20, "fuerte")))
+        mazo.append(Carta("Ataque Fuerte", "ataque", "+20 Puntos de Alcohol + efectos", efecto_ataque(20, "fuerte")))
 
     for _ in range(4):
         mazo.append(Carta("Chiste Malo", "ataque", "Reduce precisión del rival", efecto_ataque(5, "chiste")))
@@ -444,7 +444,7 @@ def crear_mazo_unico():
 
     # Defensas
     for _ in range(8):
-        mazo.append(Carta("Resistir", "defensa", "Reduce 15 borrachera", defensa_reducir))
+        mazo.append(Carta("Resistir", "defensa", "Reduce 15 Puntos de Alcohol", defensa_reducir))
 
     # Sets de licores 
     for nombre in SET_LICORES:

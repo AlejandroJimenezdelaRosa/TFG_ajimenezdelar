@@ -165,18 +165,18 @@ class Jugador:
         # ================
         # SINERGIAS
         # ================
-        # Vermut + Ataques = +10 borrachera
+        # Vermut + Ataques = +10 Puntos de Alcohol
         if carta.tipo == "ataque":
             if any(c.nombre == "Vermut" for c in self.mano):
                 rival.borracha += 10
-                texto = "SINERGIA: Vermut potencia tu ataque → +10 borrachera."
+                texto = "SINERGIA: Vermut potencia tu ataque → +10 Puntos de Alcohol."
                 partida.narrar(texto)
 
-        # Orujo + Ataque Fuerte = +15 borrachera
+        # Orujo + Ataque Fuerte = +15 Puntos de Alcohol
         if carta.nombre == "Ataque Fuerte":
             if any(c.nombre == "Orujo" for c in self.mano):
                 rival.borracha += 15
-                texto = "SINERGIA: ¡Orujo ardiente! Ataque Fuerte gana +15 borrachera."
+                texto = "SINERGIA: ¡Orujo ardiente! Ataque Fuerte gana +15 Puntos de Alcohol."
                 partida.narrar(texto)
 
         # Pacharán + Defensa = escudo +10
@@ -186,18 +186,18 @@ class Jugador:
                 texto = "SINERGIA: Pacharán te da valor → escudo +10."
                 partida.narrar(texto)
 
-        # Anís + Evento = +5 borrachera
+        # Anís + Evento = +5 Puntos de Alcohol
         if carta.tipo == "evento":
             if any(c.nombre == "Anís" for c in self.mano):
                 rival.borracha += 5
-                texto = "SINERGIA: El Anís potencia el evento → +5 borrachera."
+                texto = "SINERGIA: El Anís potencia el evento → +5 Puntos de Alcohol."
                 partida.narrar(texto)
 
-        # Set incompleto (3 licores distintos) = +30 borrachera
+        # Set incompleto (3 licores distintos) = +30 Puntos de Alcohol
         tipos = {c.nombre for c in self.mano if c.nombre in SET_LICORES}
         if len(tipos) == 3:
             rival.borracha += 30
-            texto = "SINERGIA: Casi un set completo → +30 borrachera extra."
+            texto = "SINERGIA: Casi un set completo → +30 Puntos de Alcohol extra."
             partida.narrar(texto)
 
     def activar_combo_auto(self, rival, partida):
@@ -224,7 +224,7 @@ class Jugador:
 
             texto = (
                 f"{self.nombre} activa SET COMPLETO → ¡CUBATA LEGENDARIO!\n"
-                f"{rival.nombre} recibe +{daño} borrachera."
+                f"{rival.nombre} recibe +{daño} Puntos de Alcohol."
             )
             partida.narrar(texto)
             self.combo_activado = True
@@ -249,7 +249,7 @@ class Jugador:
             self.mano = nuevas
 
             texto = (
-                f"{self.nombre} activa TRÍO → BORRACHERA TÁCTICA\n"
+                f"{self.nombre} activa TRÍO → Puntos de Alcohol TÁCTICOS\n"
                 f"Robas una carta y el rival pierde una."
             )
             partida.narrar(texto)

@@ -97,7 +97,7 @@ while running:
     # ================================
     # DIBUJO Y UPDATE DE ESCENAS
     # ===============================
-
+    
     if estado == "menu":
         menu.draw()
 
@@ -127,6 +127,21 @@ while running:
                     capitulo1.on_enter()
                     estado = "capitulo1"
 
+    elif estado == "video_derrota":
+        video_derrota.draw(window)
+        if video_derrota.finished:
+            print("VIDEO DERROTA")
+            if combate and combate.partida.capitulo == 1:
+                capitulo1.reiniciar_tras_derrota()
+
+                ui = UIManager(
+                    window,
+                    capitulo1.partida
+                )
+                capitulo1.partida.ui = ui
+                combate = None
+                estado = "capitulo1"
+
     # ====================
     # CAPÍTULO 1
     # ====================
@@ -138,6 +153,11 @@ while running:
             ui.draw()
 
         if siguiente_estado == "combate":
+            capitulo1.posicion_pre_combate = (
+                capitulo1.jugador.x,
+                capitulo1.jugador.y
+            )
+
             combate = EscenaCombate(capitulo1.partida)
             estado = "combate"
 
@@ -195,13 +215,21 @@ while running:
     elif estado == "combate":
         keys = pygame.key.get_pressed()
         resultado = combate.update(window, keys)
+        print("RESULTADO:", resultado)
 
-        # FIN DEL COMBATE CON TRANSICIÓN NEGRA
-        if resultado in ("victoria", "derrota"):
+        if resultado == "victoria":
             resultado_final = resultado
             estado = "transicion_fin_combate"
             fade_alpha = 0
             fade_surface.set_alpha(0)
+            continue
+
+        elif resultado == "derrota":
+            video_derrota = VideoPlayer(
+                "game/ui/assets/videos/derrota.mp4",
+                (1280, 720)
+            )
+            estado = "video_derrota"
             continue
 
     # ===========================================

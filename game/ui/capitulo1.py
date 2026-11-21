@@ -44,6 +44,8 @@ class Capitulo1:
         self.mostrando_opciones_fin_tutorial = False
         self.opcion_fin_tutorial = 0
 
+        self.posicion_pre_combate = None #Prueba para guardar la posición del jugador antes de entrar en combate y meter un video de derrota to guapo
+
         # ========
         # JUGADOR
         # ========
@@ -319,7 +321,12 @@ class Capitulo1:
                             self.partida.narrar(
                                 "Que empiece la partida."
                             )
+                            self.posicion_pre_combate = (
+                                self.jugador.x,
+                                self.jugador.y
+                            )
                             return "combate"
+
 
                     elif self.opciones_fin_tutorial_activas:
                         self.opciones_fin_tutorial_activas = False
@@ -335,6 +342,11 @@ class Capitulo1:
 
                             self.partida.narrar(
                                 "Que empiece la partida."
+                            )
+
+                            self.posicion_pre_combate = (
+                                self.jugador.x,
+                                self.jugador.y
                             )
                             return "combate"
 
@@ -451,6 +463,28 @@ class Capitulo1:
                     self.partida.narrar("NARRADOR: FIN DEL CAPÍTULO 1.")
                     return "capitulo2"
         return None
+
+    # ====================================
+    # REINICIO DEL COMBATE TRAS PERDER
+    # ====================================
+    def reiniciar_tras_derrota(self):
+        self.post_combate = False
+        self.mesa4_activada = False
+
+        self.esperando_mesa4 = True
+
+        self.opciones_tutorial_activas = False
+        self.opciones_post_combate_activas = False
+        self.opciones_fin_tutorial_activas = False
+
+        self.esperando_dialogo_decision = False
+
+        if self.posicion_pre_combate:
+            self.jugador.x = self.posicion_pre_combate[0]
+            self.jugador.y = self.posicion_pre_combate[1]
+
+        # Partida limpia desde 0
+        self.partida = Partida(capitulo=1)
 
     # ============================================================
     # FIN DEL COMBATE
