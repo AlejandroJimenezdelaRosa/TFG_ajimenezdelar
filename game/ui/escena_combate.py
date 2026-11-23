@@ -110,8 +110,6 @@ class EscenaCombate:
 
         self.video_vs = VideoFileClip("game/ui/assets/videos/vs_intro.mp4")
         self.video_time = 0
-        self.video_derrota = None
-        self.estado_post_derrota = False
         self.video_duration = self.video_vs.duration * 1000
         self.video_fps = self.video_vs.fps
 
@@ -151,27 +149,6 @@ class EscenaCombate:
         frame = self.video_vs.get_frame(self.video_time / 1000.0)
         frame_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
         frame_surface = pygame.transform.scale(frame_surface, (self.ancho, self.alto))
-        window.blit(frame_surface, (0, 0))
-
-    def reproducir_video_derrota(self, window, dt):
-        self.video_time += dt
-        if self.video_time >= self.video_derrota.duration * 1000:
-            self.video_derrota.close()
-            self.estado = "derrota_finalizada"
-            return
-
-        frame = self.video_derrota.get_frame(
-            self.video_time / 1000.0
-        )
-
-        frame_surface = pygame.surfarray.make_surface(
-            frame.swapaxes(0, 1)
-        )
-
-        frame_surface = pygame.transform.scale(
-            frame_surface,
-            (self.ancho, self.alto)
-        )
         window.blit(frame_surface, (0, 0))
 
     def fade_in_pre_video(self, window, dt):
@@ -670,13 +647,7 @@ class EscenaCombate:
                 self.texto_accion_completo = ""
                 self.texto_accion_visible = ""
                 self.texto_accion_alpha = 0
-                self.video_derrota = VideoFileClip(
-                    "game/ui/assets/videos/derrota.mp4"
-                )
-                self.video_time = 0
-                self.estado = "video_derrota"
-            else:
-                self.estado = "fin"
+            self.estado = "fin"
 
             self._fin_timestamp = pygame.time.get_ticks()
             return
@@ -760,13 +731,7 @@ class EscenaCombate:
                 self.texto_accion_completo = ""
                 self.texto_accion_visible = ""
                 self.texto_accion_alpha = 0
-                self.video_derrota = VideoFileClip(
-                    "game/ui/assets/videos/derrota.mp4"
-                )
-                self.video_time = 0
-                self.estado = "video_derrota"
-            else:
-                self.estado = "fin"
+            self.estado = "fin"
 
             self._fin_timestamp = pygame.time.get_ticks()
             return
@@ -836,10 +801,6 @@ class EscenaCombate:
         if self.estado == "post_video_fade_out":
             self.fade_out_post_video(window, dt)
             return
-
-        if self.estado == "video_derrota":
-            self.reproducir_video_derrota(window, dt)
-            return None
 
         if self.estado == "derrota_finalizada":
             return "derrota"

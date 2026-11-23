@@ -14,7 +14,7 @@ clock = pygame.time.Clock()
 
 # Escenas
 menu = MenuInicio(window)
-video = VideoPlayer("game/ui/assets/videos/intro.mp4", (1280, 720))
+video = VideoPlayer("game/ui/assets/videos/intro.mp4", (1280, 720),"game/ui/assets/videos/intro.mp3")
 capitulo1 = Capitulo1()
 capitulo2 = None
 
@@ -27,7 +27,7 @@ fade_alpha = 0
 fade_surface = pygame.Surface((1280, 720))
 fade_surface.fill((0, 0, 0))
 
-resultado_final = None  # ← para guardar victoria/derrota
+resultado_final = None  # para guardar victoria/derrota
 
 espera_intro = 0
 alpha_video = 0
@@ -73,9 +73,7 @@ while running:
                 alpha_fin_video = 0
 
                 video = VideoPlayer(
-                    "game/ui/assets/videos/intro.mp4",
-                    (1280, 720)
-                )
+                    "game/ui/assets/videos/intro.mp4",(1280, 720), "game/ui/assets/videos/intro.mp3")
                 
         elif estado == "capitulo1":
             if ui:
@@ -225,10 +223,7 @@ while running:
             continue
 
         elif resultado == "derrota":
-            video_derrota = VideoPlayer(
-                "game/ui/assets/videos/derrota.mp4",
-                (1280, 720)
-            )
+            video_derrota = VideoPlayer("game/ui/assets/videos/derrota.mp4",(1280, 720),"game/ui/assets/videos/derrota.mp3")
             estado = "video_derrota"
             continue
 

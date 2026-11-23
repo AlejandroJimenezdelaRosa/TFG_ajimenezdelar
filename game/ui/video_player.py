@@ -3,12 +3,13 @@ from moviepy import VideoFileClip
 
 
 class VideoPlayer:
-    def __init__(self, archivo_video, tamaño):
+    def __init__(self, archivo_video, tamaño, archivo_audio=None):
         self.clip = VideoFileClip(archivo_video)
         self.frames = self.clip.iter_frames(fps=30)
         self.finished = False
         self.tamaño = tamaño
         self.audio_iniciado = False
+        self.archivo_audio = archivo_audio
 
         # Guardar el último frame mostrado
         self.last_frame = None
@@ -23,10 +24,10 @@ class VideoPlayer:
         # Iniciar el audio
         if not self.audio_iniciado:
 
-            pygame.mixer.music.load(
-                "game/ui/assets/videos/intro.mp3"
-            )
-            pygame.mixer.music.play()
+            if self.archivo_audio:
+                pygame.mixer.music.load(self.archivo_audio)
+                pygame.mixer.music.play()
+
             self.audio_iniciado = True
         try:
             frame = next(self.frames)
