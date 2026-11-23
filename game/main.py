@@ -126,17 +126,14 @@ while running:
                     estado = "capitulo1"
 
     elif estado == "video_derrota":
+
         video_derrota.draw(window)
         if video_derrota.finished:
-            print("VIDEO DERROTA")
             if combate and combate.partida.capitulo == 1:
                 capitulo1.reiniciar_tras_derrota()
-
-                ui = UIManager(
-                    window,
-                    capitulo1.partida
-                )
+                ui = UIManager(window,capitulo1.partida)
                 capitulo1.partida.ui = ui
+                capitulo1.mostrar_dialogo_derrota()
                 combate = None
                 estado = "capitulo1"
 

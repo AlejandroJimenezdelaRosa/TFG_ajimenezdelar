@@ -50,48 +50,22 @@ class Capitulo1:
         # JUGADOR
         # ========
         self.jugador = pygame.Rect(624, 336, 32, 48)
-        self.sprite_frente = pygame.image.load(
-            "game/ui/assets/personajes/protagonista/frente.png"
-        ).convert_alpha()
+        self.sprite_frente = pygame.image.load("game/ui/assets/personajes/protagonista/frente.png").convert_alpha()
 
-        self.sprite_espalda = pygame.image.load(
-            "game/ui/assets/personajes/protagonista/espalda.png"
-        ).convert_alpha()
+        self.sprite_espalda = pygame.image.load("game/ui/assets/personajes/protagonista/espalda.png").convert_alpha()
 
-        self.sprite_izquierda = pygame.image.load(
-            "game/ui/assets/personajes/protagonista/izquierda.png"
-        ).convert_alpha()
+        self.sprite_izquierda = pygame.image.load("game/ui/assets/personajes/protagonista/izquierda.png").convert_alpha()
 
-        self.sprite_derecha = pygame.image.load(
-            "game/ui/assets/personajes/protagonista/derecha.png"
-        ).convert_alpha()
-
+        self.sprite_derecha = pygame.image.load("game/ui/assets/personajes/protagonista/derecha.png").convert_alpha()
         self.vel = 4
         self.post_combate = False
 
         #Escalado de sprites
         tam = (105, 137)
-
-        self.sprite_frente = pygame.transform.scale(
-            self.sprite_frente,
-            tam
-        )
-
-        self.sprite_espalda = pygame.transform.scale(
-            self.sprite_espalda,
-            tam
-        )
-
-        self.sprite_izquierda = pygame.transform.scale(
-            self.sprite_izquierda,
-            tam
-        )
-
-        self.sprite_derecha = pygame.transform.scale(
-            self.sprite_derecha,
-            tam
-        )
-
+        self.sprite_frente = pygame.transform.scale(self.sprite_frente,tam)
+        self.sprite_espalda = pygame.transform.scale(self.sprite_espalda,tam)
+        self.sprite_izquierda = pygame.transform.scale(self.sprite_izquierda,tam)
+        self.sprite_derecha = pygame.transform.scale(self.sprite_derecha,tam)
         self.sprite_actual = self.sprite_frente
 
         # ============================
@@ -178,9 +152,7 @@ class Capitulo1:
         self.mesa4_activada = True
         self.opciones_tutorial_activas = True
 
-        self.partida.ui.dialogue.text = (
-            "BIGOTES: ¿Quieres que te expliquemos cómo jugar?"
-        )
+        self.partida.ui.dialogue.text = ("BIGOTES: ¿Quieres que te expliquemos cómo jugar?")
 
         self.partida.ui.dialogue.set_options([
             "Explicación de cómo se juega",
@@ -406,9 +378,7 @@ class Capitulo1:
             if not dialogo.visible and len(dialogo.queue) == 0:
                 self.mesa4_activada = False
                 dialogo.visible = True
-                dialogo.text = (
-                    "BIGOTES: ¿Quieres repasar el tutorial o empezamos el combate?"
-                )
+                dialogo.text = ("BIGOTES: ¿Quieres repasar el tutorial o empezamos el combate?")
 
                 dialogo.set_options([
                     "Repetir tutorial",
@@ -429,11 +399,8 @@ class Capitulo1:
         # ============================================================
         if self.post_combate:
             if not dialogo.visible and len(dialogo.queue) == 0:
-                print("POST COMBATE")
                 self.post_combate = False
-
                 self.opciones_post_combate_activas = True
-                print("MOSTRANDO OPCIONES COMBATE")
 
                 self.partida.ui.dialogue.visible = True
                 self.partida.ui.dialogue.text = (
@@ -470,13 +437,10 @@ class Capitulo1:
     def reiniciar_tras_derrota(self):
         self.post_combate = False
         self.mesa4_activada = False
-
         self.esperando_mesa4 = True
-
         self.opciones_tutorial_activas = False
         self.opciones_post_combate_activas = False
         self.opciones_fin_tutorial_activas = False
-
         self.esperando_dialogo_decision = False
 
         if self.posicion_pre_combate:
@@ -485,6 +449,21 @@ class Capitulo1:
 
         # Partida limpia desde 0
         self.partida = Partida(capitulo=1)
+
+    # ====================================
+    # DIALOGOS TRAS PERDER
+    # ====================================
+    def mostrar_dialogo_derrota(self):
+
+        self.partida.narrar("NARRADOR: Abres los ojos con la cabeza dándote vueltas.")
+        self.partida.narrar("NARRADOR: Lo último que recuerdas son las luces azules de una ambulancia camino del hospital.")
+        self.partida.narrar("MANOLO: Alejandro, chiquillo... menuda noche nos has dado.")
+        self.partida.narrar("MANOLO: Has tenido suerte. Un susto así le puede pasar a cualquiera.")
+        self.partida.narrar("MANOLO: Pero perder una partida no es grave. Perder el control de lo que bebes sí puede serlo.")
+        self.partida.narrar("BIGOTES: Las cartas siempre dan revancha.")
+        self.partida.narrar("POETA: La salud no siempre concede una segunda oportunidad con tanta facilidad.")
+        self.partida.narrar("INFORMÁTICO: Conocer tus límites también forma parte del juego.")
+        self.partida.narrar("MANOLO: Venga, respira hondo. Cuando estés listo, vuelve a intentarlo.")
 
     # ============================================================
     # FIN DEL COMBATE
@@ -504,18 +483,6 @@ class Capitulo1:
             self.partida.narrar("BIGOTES: Pero no hoy. Hoy disfruta. Que lo que viene es gordo.")
             self.partida.narrar("MANOLO: ¡Alejandro! Cuando termines con estos, acércate a la barra. Tengo que pedirte un favor importante.")
             self.partida.narrar("NARRADOR: Algo se mueve en Sevilla… y tú estás en medio sin saberlo.")
-
-        else:
-            self.partida.narrar("BIGOTES: Ay, criatura… te han dado pa'l pelo.")
-            self.partida.narrar("POETA: No pasa ná, el arte también es perder.")
-            self.partida.narrar("INFORMÁTICO: Venga, siéntate y descansa un poco.")
-            self.partida.narrar("BIGOTES: Mira, Alejandro… perder es parte del camino. Aquí nadie nació sabiendo.")
-            self.partida.narrar("POETA: El fracaso es un maestro severo, pero justo.")
-            self.partida.narrar("INFORMÁTICO: Si quieres mejorar, deberías visitar la Peña del Gallo Rojo.")
-            self.partida.narrar("BIGOTES: Allí está el 'Gallito'. Ese sí que sabe. Te puede enseñar un par de trucos.")
-            self.partida.narrar("POETA: Pero no ahora. Ahora respira, que casi te caes redondo.")
-            self.partida.narrar("MANOLO: ¡Alejandro! Cuando puedas, acércate a la barra. Tengo que hablar contigo.")
-            self.partida.narrar("NARRADOR: Quizá esta derrota sea el primer paso hacia algo más grande…")
 
         self.post_combate = True
         self.mesa4_activada = False
