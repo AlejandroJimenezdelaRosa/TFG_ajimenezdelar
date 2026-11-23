@@ -113,7 +113,7 @@ class Capitulo1:
         self.tiempo = 0
 
         # Puerta de salida (Iniciar siguiente cap)
-        self.puerta_rect = pygame.Rect(1100, 600, 80, 80)
+        self.puerta_rect = pygame.Rect(560,680, 120, 50)
 
     # ============================================================
     # ENTRADA AL CAPÍTULO 1
