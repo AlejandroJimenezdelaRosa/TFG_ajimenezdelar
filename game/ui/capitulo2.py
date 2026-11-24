@@ -22,17 +22,26 @@ class Capitulo2:
         # ========
         # JUGADOR
         # ========
-        self.jugador = pygame.Rect(664, 572, 32, 48)
+        self.jugador = pygame.Rect(640, 620, 32, 48)
+        self.sprite_frente = pygame.image.load("game/ui/assets/personajes/protagonista/frente.png").convert_alpha()
+        self.sprite_espalda = pygame.image.load("game/ui/assets/personajes/protagonista/espalda.png").convert_alpha()
+        self.sprite_izquierda = pygame.image.load("game/ui/assets/personajes/protagonista/izquierda.png").convert_alpha()
+        self.sprite_derecha = pygame.image.load("game/ui/assets/personajes/protagonista/derecha.png").convert_alpha()
+        tam = (105, 137)
+        self.sprite_frente = pygame.transform.scale(self.sprite_frente,tam)
+        self.sprite_espalda = pygame.transform.scale(self.sprite_espalda,tam)
+        self.sprite_izquierda = pygame.transform.scale(self.sprite_izquierda,tam)
+        self.sprite_derecha = pygame.transform.scale(self.sprite_derecha,tam)
+        self.sprite_actual = self.sprite_frente
         self.vel = 4
-
+        self.posicion_pre_combate = None
         # ===============================
         # POSICIONES DE LAS COLISIONES
         # ===========v===================
         self.colisiones = [
-            pygame.Rect(210, 400, 200, 80),
-            pygame.Rect(210, 556, 200, 80),
-            pygame.Rect(20, 284, 80, 368),
-            pygame.Rect(20, 220, 552, 80),
+            pygame.Rect(20, 20, 630, 320),
+            pygame.Rect(30, 510, 400, 180),
+            pygame.Rect(710, 20, 520, 650),
         ]
 
         # ==================
@@ -67,10 +76,66 @@ class Capitulo2:
     def on_enter(self):
         p = self.partida.narrar
 
-        p("NARRADOR: Llegas a la Peña del Gallo Rojo.")
-        p("NARRADOR: El ambiente está cargado de música, risas y humo.")
-        p("NARRADOR: Todos hablan de un tal Gallito.")
-        p("NARRADOR: Dicen que es el mejor jugador de toda Sevilla.")
+        p("NARRADOR: Tras la experiencia en la taberna de Manolo, decides seguir mejorando.")
+        p("NARRADOR: Las indicaciones te llevan hasta la famosa Peña del Gallo Rojo.")
+        p("NARRADOR: Allí se reúnen algunos de los mejores jugadores de Sevilla.")
+        p("NARRADOR: Entre ellos destaca un nombre por encima del resto.")
+        p("NARRADOR: Gallito.")
+        p("NARRADOR: Algunos lo consideran un genio de las cartas.")
+        p("NARRADOR: Otros dicen que aprendió a respetar el juego después de cometer muchos errores con el alcohol.")
+
+    # ========================================================
+    # EREUTILIZAR LA POSICION DEL JUGADOR PARA LAS DERROTAS
+    # ========================================================
+    def reiniciar_tras_derrota(self):
+
+        self.partida = Partida(capitulo=2)
+
+        self.dialogo_gallito_mostrado = False
+        self.iniciar_combate = False
+        self.e_pulsado_antes = False
+
+        if self.posicion_pre_combate:
+            self.jugador.x = self.posicion_pre_combate[0]
+            self.jugador.y = self.posicion_pre_combate[1]
+
+    def mostrar_dialogo_derrota(self):
+
+        self.partida.narrar(
+            "NARRADOR: Las sirenas de una ambulancia resuenan en tu memoria."
+        )
+
+        self.partida.narrar(
+            "NARRADOR: Esta vez has aprendido de la forma más dura que el exceso de alcohol tiene consecuencias reales."
+        )
+
+        self.partida.narrar(
+            "GALLITO: Ya veo que el susto no te ha quitado las ganas de aprender."
+        )
+
+        self.partida.narrar(
+            "GALLITO: Escucha bien, Alejandro."
+        )
+
+        self.partida.narrar(
+            "GALLITO: Hay jugadores que creen que aguantar más bebida les hace más fuertes."
+        )
+
+        self.partida.narrar(
+            "GALLITO: Se equivocan."
+        )
+
+        self.partida.narrar(
+            "GALLITO: La verdadera fortaleza está en conocer tus límites."
+        )
+
+        self.partida.narrar(
+            "GALLITO: Controlar lo que haces siempre será más difícil que dejarte llevar."
+        )
+
+        self.partida.narrar(
+            "GALLITO: Descansa, piensa en lo ocurrido y vuelve cuando estés preparado."
+        )
 
     # =======
     # UPDATE
@@ -82,12 +147,19 @@ class Capitulo2:
 
         if keys[pygame.K_w]:
             self.jugador.y -= self.vel
+            self.sprite_actual = self.sprite_espalda
+
         if keys[pygame.K_s]:
             self.jugador.y += self.vel
+            self.sprite_actual = self.sprite_frente
+
         if keys[pygame.K_a]:
             self.jugador.x -= self.vel
+            self.sprite_actual = self.sprite_izquierda
+
         if keys[pygame.K_d]:
             self.jugador.x += self.vel
+            self.sprite_actual = self.sprite_derecha
 
         # Colisiones
         for col in self.colisiones:
@@ -96,7 +168,20 @@ class Capitulo2:
                 break
 
         # Jugador
-        pygame.draw.rect(window, (255, 255, 0), self.jugador)
+        sprite_x = (
+            self.jugador.centerx
+            - self.sprite_actual.get_width() // 2
+        )
+
+        sprite_y = (
+            self.jugador.bottom
+            - self.sprite_actual.get_height()
+        )
+
+        window.blit(
+            self.sprite_actual,
+            (sprite_x, sprite_y)
+        )
         pulsando_e = keys[pygame.K_e]
         nueva_pulsacion_e = pulsando_e and not self.e_pulsado_antes
 
@@ -120,35 +205,39 @@ class Capitulo2:
                 self.dialogo_gallito_mostrado = True
                 self.iniciar_combate = True
                 self.partida.narrar(
-                    "GALLITO: Hombre... ya era hora de que aparecieras."
-                )
-
-                self.partida.narrar(
                     "GALLITO: Así que tú eres Alejandro."
                 )
 
                 self.partida.narrar(
-                    "GALLITO: Llevo días escuchando historias sobre ti."
+                    "GALLITO: He escuchado lo que ocurrió en la taberna."
                 )
 
                 self.partida.narrar(
-                    "JUGADOR: Espero que sean buenas."
+                    "JUGADOR: Ya veo que las noticias vuelan."
                 )
 
                 self.partida.narrar(
-                    "GALLITO: Eso vamos a averiguar ahora."
+                    "GALLITO: Aquí todos hablan. Lo importante es aprender de lo que pasó."
                 )
 
                 self.partida.narrar(
-                    "GALLITO: En esta peña las palabras no tienen valor."
+                    "GALLITO: Muchos creen que ser fuerte consiste en aguantar más alcohol."
                 )
 
                 self.partida.narrar(
-                    "GALLITO: Aquí se habla jugando."
+                    "GALLITO: Yo aprendí hace años que la verdadera habilidad está en saber cuándo parar."
                 )
 
                 self.partida.narrar(
-                    "GALLITO: Ven. Siéntate. Es hora de probar tu talento."
+                    "JUGADOR: Entonces... ¿vas a enseñarme?"
+                )
+
+                self.partida.narrar(
+                    "GALLITO: Primero voy a comprobar si estás preparado para escuchar."
+                )
+
+                self.partida.narrar(
+                    "GALLITO: Siéntate. Juguemos una partida."
                 )
 
         # ==================================================
@@ -157,6 +246,10 @@ class Capitulo2:
         if self.iniciar_combate:
             dialogo = self.partida.ui.dialogue
             if not dialogo.visible and len(dialogo.queue) == 0:
+                self.posicion_pre_combate = (
+                    self.jugador.x,
+                    self.jugador.y
+                )
                 self.iniciar_combate = False
                 return "combate"
 

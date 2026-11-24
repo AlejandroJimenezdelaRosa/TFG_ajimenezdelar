@@ -9,7 +9,7 @@ SET_LICORES = ["Anís", "Pacharán", "Orujo", "Vermut"]
 # ESCENA DEL COMBATE
 # ============================================================
 class EscenaCombate:
-    def __init__(self, partida):
+    def __init__( self, partida, video_vs="game/ui/assets/videos/vs_intro.mp4", audio_vs="game/ui/assets/videos/vs_intro_audio.mp3"):
         self.partida = partida
         self.partida.escena = self 
         self.jugador = partida.jugador
@@ -108,13 +108,13 @@ class EscenaCombate:
         self.estado = "pre_video_fade_in"
         self.fade_alpha = 255  # empieza en negro
 
-        self.video_vs = VideoFileClip("game/ui/assets/videos/vs_intro.mp4")
+        self.video_vs = VideoFileClip(video_vs)
         self.video_time = 0
         self.video_duration = self.video_vs.duration * 1000
         self.video_fps = self.video_vs.fps
 
         pygame.mixer.init()
-        self.vs_audio = pygame.mixer.Sound("game/ui/assets/videos/vs_intro_audio.mp3")
+        self.vs_audio = pygame.mixer.Sound(audio_vs)
         self.vs_audio_played = False
         self._last_tick = pygame.time.get_ticks()
         self.recalcular_posiciones()

@@ -126,7 +126,6 @@ while running:
                     estado = "capitulo1"
 
     elif estado == "video_derrota":
-
         video_derrota.draw(window)
         if video_derrota.finished:
             if combate and combate.partida.capitulo == 1:
@@ -136,6 +135,14 @@ while running:
                 capitulo1.mostrar_dialogo_derrota()
                 combate = None
                 estado = "capitulo1"
+
+            elif combate and combate.partida.capitulo == 2:
+                capitulo2.reiniciar_tras_derrota()
+                ui = UIManager(window,capitulo2.partida)
+                capitulo2.partida.ui = ui
+                capitulo2.mostrar_dialogo_derrota()
+                combate = None
+                estado = "capitulo2"
 
     # ====================
     # CAPÍTULO 1
@@ -153,7 +160,7 @@ while running:
                 capitulo1.jugador.y
             )
 
-            combate = EscenaCombate(capitulo1.partida)
+            combate = EscenaCombate(capitulo1.partida,"game/ui/assets/videos/vs_intro.mp4","game/ui/assets/videos/vs_intro_audio.mp3")
             estado = "combate"
 
         elif siguiente_estado == "capitulo2":
@@ -176,7 +183,7 @@ while running:
 
         # Combate
         if siguiente_estado == "combate":
-            combate = EscenaCombate(capitulo2.partida)
+            combate = EscenaCombate(capitulo2.partida,"game/ui/assets/videos/vs_gallito.mp4","game/ui/assets/videos/vs_gallito_audio.mp3")
             estado = "combate"
 
         # Minijuego de cervezas si se añade
