@@ -35,6 +35,10 @@ class Capitulo2:
         self.sprite_actual = self.sprite_frente
         self.vel = 4
         self.posicion_pre_combate = None
+        self.mostrar_dialogo_consecuencias = False
+        self.post_combate = False
+        self.opciones_post_combate_activas = False
+        self.esperando_dialogo_decision = False
         # ===============================
         # POSICIONES DE LAS COLISIONES
         # ===========v===================
@@ -99,6 +103,22 @@ class Capitulo2:
             self.jugador.x = self.posicion_pre_combate[0]
             self.jugador.y = self.posicion_pre_combate[1]
 
+    # ============================================================
+    # FIN DEL COMBATE EN CAPÍTULO 2
+    # ============================================================
+    def on_fin_combate(self, resultado):
+        if resultado == "victoria":
+            self.partida.narrar("GALLITO: Has jugado con cabeza, Alejandro. No te has pasado de la raya.")
+            self.partida.narrar("GALLITO: Ganar no es aguantar más copas; es saber cuándo decir basta.")
+            self.partida.narrar("NARRADOR: Has superado el duelo manteniendo el control.")
+        else:
+            self.partida.narrar("GALLITO: El alcohol te ha nublado la vista antes de tiempo.")
+            self.partida.narrar("GALLITO: Cuando pierdes el control, pierdes la partida… y algo más importante.")
+            self.partida.narrar("NARRADOR: La resaca y el exceso dejan una lección clara.")
+
+        self.post_combate = True
+
+
     def mostrar_dialogo_derrota(self):
 
         self.partida.narrar(
@@ -136,6 +156,47 @@ class Capitulo2:
         self.partida.narrar(
             "GALLITO: Descansa, piensa en lo ocurrido y vuelve cuando estés preparado."
         )
+
+    # ==================================================
+    # REINICIAR EL COMBATE PARA EVITAR PROBLEMAS
+    # ==================================================
+    def preparar_combate_gallito(self):
+        decision_cap1 = self.partida.decision_cap1
+        ui = self.partida.ui
+        self.partida = Partida(capitulo=2)
+        self.partida.decision_cap1 = decision_cap1
+        self.partida.ui = ui
+        return decision_cap1
+
+    def aplicar_penalizacion_capitulo1(self, decision):
+        if decision == "celebrar":
+            self.partida.jugador.borracha = 35
+        
+        elif decision == "moderado":
+            self.partida.jugador.borracha = 20
+
+        elif decision == "descansar":
+            self.partida.jugador.borracha = 0
+
+    # ======================================================================
+    # DIALOGOS DE CONSECUENCIAS DEL CAPÍTULO 1 SEGÚN LA DECISIÓN TOMADA
+    # ======================================================================
+    def mostrar_consecuencias_capitulo1(self):
+
+        decision = self.partida.decision_cap1
+
+        if decision == "celebrar":
+            self.partida.narrar("NARRADOR: La larga celebración de anoche todavía pasa factura.")
+            self.partida.narrar("NARRADOR: Te cuesta concentrarte y comienzas el duelo con secuelas de la noche anterior.")
+
+        elif decision == "moderado":
+            self.partida.narrar("NARRADOR: Descansaste algo, aunque todavía notas algunos efectos de la noche anterior.")
+            self.partida.narrar("NARRADOR: No llegas en plenas condiciones, pero tampoco estás en tu peor momento.")
+
+        elif decision == "descansar":
+            self.partida.narrar("NARRADOR: Haber descansado y evitado el exceso te permite afrontar el desafío en las mejores condiciones.")
+            self.partida.narrar("NARRADOR: Te sientes despejado y preparado para enfrentarte a Gallito.")
+
 
     # =======
     # UPDATE
@@ -246,33 +307,97 @@ class Capitulo2:
         if self.iniciar_combate:
             dialogo = self.partida.ui.dialogue
             if not dialogo.visible and len(dialogo.queue) == 0:
-                self.posicion_pre_combate = (
-                    self.jugador.x,
-                    self.jugador.y
-                )
+                self.posicion_pre_combate = (self.jugador.x,self.jugador.y)
+                decision = self.preparar_combate_gallito()
+                self.aplicar_penalizacion_capitulo1(decision)
+                self.mostrar_consecuencias_capitulo1()
                 self.iniciar_combate = False
-                return "combate"
+                self.mostrar_dialogo_consecuencias = True
 
-        # ================================================================
-        # INTERACCIÓN CON LA PUERTA Y POR TANTO, INICIAR EL CAPÍTULO 2
-        # ================================================================
-        if self.jugador.colliderect(self.salida_rect):
-            alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
-            icono = self.icono_e.copy()
-            icono.set_alpha(alpha)
+        if self.mostrar_dialogo_consecuencias:
+            dialogo = self.partida.ui.dialogue
+            if not dialogo.visible and len(dialogo.queue) == 0:
+                 self.mostrar_dialogo_consecuencias = False
+                 return "combate"
 
-            window.blit(
-                icono,
-                (
-                    self.salida_rect.x + 20,
-                    self.salida_rect.y - 40
+        dialogo = self.partida.ui.dialogue
+
+        if dialogo.showing_options:
+            if keys[pygame.K_RETURN]:
+                opcion = dialogo.confirm_option()
+
+                if opcion is not None and self.opciones_post_combate_activas:
+                    self.opciones_post_combate_activas = False
+
+                    if opcion == 0:
+                        self.partida.narrar(
+                            "GALLITO: Seguir bebiendo para 'celebrar' o 'desahogarte' suele salir caro."
+                        )
+                        self.partida.narrar(
+                            "NARRADOR: Forzar más alcohol solo aumenta los riesgos y la pérdida de control."
+                        )
+                    elif opcion == 1:
+                        self.partida.narrar(
+                            "GALLITO: Beber despacio, alternar con agua y poner un límite marca la diferencia."
+                        )
+                        self.partida.narrar(
+                            "NARRADOR: Cuidarte en el momento evita consecuencias mayores después."
+                        )
+                    elif opcion == 2:
+                        self.partida.narrar(
+                            "GALLITO: Saber parar a tiempo también es una decisión inteligente."
+                        )
+                        self.partida.narrar(
+                            "NARRADOR: Escuchar a tu cuerpo te permite seguir con claridad."
+                        )
+
+                    self.esperando_dialogo_decision = True
+
+        # ============================================================
+        # POST-COMBATE Y ESPERAR A QUE ACABEN LOS DIALOGOS
+        # ============================================================
+        if self.post_combate:
+            if not dialogo.visible and len(dialogo.queue) == 0:
+                self.post_combate = False
+                self.opciones_post_combate_activas = True
+
+                dialogo.visible = True
+                dialogo.text = (
+                    "GALLITO: Después de un duelo así, ¿qué actitud tomas frente al alcohol?"
                 )
-            )
+                dialogo.set_options([
+                    "Seguir bebiendo sin poner límite",
+                    "Beber con moderación y alternar con agua",
+                    "Parar y evitar seguir sumando alcohol"
+                ])
 
-            if nueva_pulsacion_e:
-                self.partida.narrar(
-                    "NARRADOR: Sales de la Peña del Gallo Rojo."
+        if self.esperando_dialogo_decision:
+            if not dialogo.visible and len(dialogo.queue) == 0:
+                self.esperando_dialogo_decision = False
+        
+        # ================================================================
+        # INTERACCIÓN CON LA PUERTA Y POR TANTO, INICIAR EL CAPÍTULO 3
+        # ================================================================
+        if not self.post_combate and not self.opciones_post_combate_activas and not self.esperando_dialogo_decision:
+            if self.jugador.colliderect(self.salida_rect):
+                alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
+                icono = self.icono_e.copy()
+                icono.set_alpha(alpha)
+
+                window.blit(
+                    icono,
+                    (
+                        self.salida_rect.x + 20,
+                        self.salida_rect.y - 40
+                    )
                 )
-                return "capitulo3"
+
+                if nueva_pulsacion_e:
+                    self.partida.narrar(
+                        "NARRADOR: Sales de la Peña del Gallo Rojo."
+                    )
+                    return "capitulo3"
+
         self.e_pulsado_antes = pulsando_e
         return None
+

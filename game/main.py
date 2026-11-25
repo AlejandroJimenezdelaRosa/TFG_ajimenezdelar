@@ -217,7 +217,6 @@ while running:
     elif estado == "combate":
         keys = pygame.key.get_pressed()
         resultado = combate.update(window, keys)
-        print("RESULTADO:", resultado)
 
         if resultado == "victoria":
             resultado_final = resultado
@@ -266,6 +265,7 @@ while running:
                 ui = UIManager(window, capitulo2.partida)
                 capitulo2.partida.ui = ui
 
+                capitulo2.on_fin_combate(resultado_final)
                 estado = "capitulo2"
 
     pygame.display.update()

@@ -61,13 +61,13 @@ class Partida:
         if capitulo == 1:
             return Jugador("Desconocido")
         if capitulo == 2:
-            return Jugador("Francisco")
+            return Jugador("Gallito")
         if capitulo == 3:
-            return Jugador("Británico")
+            return Jugador("Rival")
         if capitulo == 4:
-            return Jugador("Alemán")
+            return Jugador("Rival")
         if capitulo == 5:
-            return Jugador("Italiano")
+            return Jugador("Rival")
         return Jugador("Rival Misterioso")
 
     # ============================
