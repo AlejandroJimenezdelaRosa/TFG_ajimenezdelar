@@ -26,6 +26,7 @@ class Capitulo1:
         self.down_pulsado = False
         self.enter_pulsado = False
         self.esperando_dialogo_decision = False
+        self.combate_ganado = False
 
         # ========================
         # ESTADOS DE LA NARRACIÓN
@@ -259,7 +260,7 @@ class Capitulo1:
         # ============================================================
         # INTERACCIÓN CON LA MESA 4
         # ============================================================
-        if self.esperando_mesa4 and not self.mesa4_activada:
+        if self.esperando_mesa4 and not self.mesa4_activada and not self.combate_ganado:
             if self.jugador.colliderect(self.trigger_mesa4):
                 alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
                 icono = self.icono_e.copy()
@@ -471,6 +472,7 @@ class Capitulo1:
     def on_fin_combate(self, resultado):
 
         if resultado == "victoria":
+            self.combate_ganado = True
             self.partida.narrar("BIGOTES: ¡Ole ahí! Les has dado una paliza, criatura.")
             self.partida.narrar("POETA: Niño, tienes talento. El arte te corre por las venas.")
             self.partida.narrar("INFORMÁTICO: Te has ganado una ronda gratis… y mi respeto, que es más difícil.")

@@ -39,6 +39,8 @@ class Capitulo2:
         self.post_combate = False
         self.opciones_post_combate_activas = False
         self.esperando_dialogo_decision = False
+        self.combate_ganado = False
+
         # ===============================
         # POSICIONES DE LAS COLISIONES
         # ===========v===================
@@ -108,6 +110,7 @@ class Capitulo2:
     # ============================================================
     def on_fin_combate(self, resultado):
         if resultado == "victoria":
+            self.combate_ganado = True
             self.partida.narrar("GALLITO: Has jugado con cabeza, Alejandro. No te has pasado de la raya.")
             self.partida.narrar("GALLITO: Ganar no es aguantar más copas; es saber cuándo decir basta.")
             self.partida.narrar("NARRADOR: Has superado el duelo manteniendo el control.")
@@ -262,7 +265,7 @@ class Capitulo2:
                 )
             )
 
-            if nueva_pulsacion_e and not self.dialogo_gallito_mostrado:
+            if nueva_pulsacion_e and not self.dialogo_gallito_mostrado and not self.combate_ganado:
                 self.dialogo_gallito_mostrado = True
                 self.iniciar_combate = True
                 self.partida.narrar(
