@@ -20,7 +20,7 @@ class Capitulo1:
         self.enter_pulsado = False
         self.esperando_dialogo_decision = False
         self.combate_ganado = False
-
+        self.e_pulsado_antes = False
         # ========================
         # ESTADOS DE LA NARRACIÓN
         # ========================
@@ -192,6 +192,8 @@ class Capitulo1:
     # ============================================================
     def update(self, window, keys):
         self.tiempo += 0.1
+        pulsando_e = keys[pygame.K_e]
+        nueva_pulsacion_e = pulsando_e and not self.e_pulsado_antes
 
         # Fondo
         window.blit(self.fondo, (0, 0))
@@ -349,7 +351,7 @@ class Capitulo1:
                 icono.set_alpha(alpha)
                 window.blit(icono, (self.puerta_rect.x + 20, self.puerta_rect.y - 40))
 
-                if keys[pygame.K_e]:
+                if nueva_pulsacion_e:
                     if not self.combate_ganado:
                         self.partida.narrar("NARRADOR: Antes de marcharte deberías terminar lo que has venido a hacer.")
                         self.partida.narrar("NARRADOR: La mesa 4 sigue esperando.")
@@ -359,6 +361,7 @@ class Capitulo1:
                         self.partida.narrar("NARRADOR: …y sin saberlo, das el primer paso hacia una aventura mucho más grande.")
                         self.partida.narrar("NARRADOR: FIN DEL CAPÍTULO 1.")
                         return "capitulo2"
+                    self.e_pulsado_antes = pulsando_e
         return None
 
     # ====================================
