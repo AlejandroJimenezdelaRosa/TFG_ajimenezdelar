@@ -1,0 +1,449 @@
+import pygame
+from partida import Partida
+import math
+
+class Capitulo1:
+    def __init__(self):
+        # ===================
+        # FONDO DEL CAPÍTULO
+        # ===================
+        self.fondo = pygame.image.load("game/ui/assets/escenarios/capitulo1.png").convert()
+        self.fondo = pygame.transform.scale(self.fondo,(1280, 720))
+        self.trigger_mesa4 = pygame.Rect(760,360,170,150)
+
+        # ========
+        # PARTIDA
+        # ========
+        self.partida = Partida(capitulo=1)
+        self.up_pulsado = False
+        self.down_pulsado = False
+        self.enter_pulsado = False
+        self.esperando_dialogo_decision = False
+        self.combate_ganado = False
+        self.e_pulsado_antes = False
+        # ========================
+        # ESTADOS DE LA NARRACIÓN
+        # ========================
+        self.esperando_mesa4 = False
+        self.mesa4_activada = False
+        self.opciones_tutorial_activas = False
+        self.opciones_post_combate_activas = False
+        self.opciones_fin_tutorial_activas = False
+
+        # Menú del tutorial
+        self.mostrando_opciones_tutorial = False
+        self.opcion_seleccionada = 0
+
+        # Menú final del tutorial
+        self.mostrando_opciones_fin_tutorial = False
+        self.opcion_fin_tutorial = 0
+
+        self.posicion_pre_combate = None #Prueba para guardar la posición del jugador antes de entrar en combate y meter un video de derrota to guapo
+
+        # ========
+        # JUGADOR
+        # ========
+        self.jugador = pygame.Rect(624, 336, 32, 48)
+        self.sprite_frente = pygame.image.load("game/ui/assets/personajes/protagonista/frente.png").convert_alpha()
+        self.sprite_espalda = pygame.image.load("game/ui/assets/personajes/protagonista/espalda.png").convert_alpha()
+        self.sprite_izquierda = pygame.image.load("game/ui/assets/personajes/protagonista/izquierda.png").convert_alpha()
+        self.sprite_derecha = pygame.image.load("game/ui/assets/personajes/protagonista/derecha.png").convert_alpha()
+        self.vel = 4
+        self.post_combate = False
+
+        #Escalado de sprites
+        tam = (105, 137)
+        self.sprite_frente = pygame.transform.scale(self.sprite_frente,tam)
+        self.sprite_espalda = pygame.transform.scale(self.sprite_espalda,tam)
+        self.sprite_izquierda = pygame.transform.scale(self.sprite_izquierda,tam)
+        self.sprite_derecha = pygame.transform.scale(self.sprite_derecha,tam)
+        self.sprite_actual = self.sprite_frente
+
+        # ============================
+        # POSICIONES DE LAS COLISIONES
+        # ============================
+        self.colisiones = [
+            # Cocina + barra
+            pygame.Rect(21,0,449,380),
+            # Barra y zona de servicio
+            pygame.Rect( 474,0,786,307),
+            # Superior izquierda
+            pygame.Rect(70, 425, 110, 70),
+            # Superior centro izquierda
+            pygame.Rect(265, 425, 110, 70),
+            # Superior derecha
+            pygame.Rect(1025, 425, 110, 70),
+            # Inferior izquierda
+            pygame.Rect(80, 560, 110, 70),
+            # Inferior centro izquierda
+            pygame.Rect(285, 560, 110, 70),
+            # Inferior derecha
+            pygame.Rect(1025, 560, 110, 70),
+            pygame.Rect(1170,575,50,80),
+            # Mesa inferior central
+            pygame.Rect(800,570,110,70),
+            # Mesa 4
+            pygame.Rect(790,410,120,80),
+            # Paredes
+            pygame.Rect(0, 0, 30, 720),
+            pygame.Rect(1250, 0, 30, 720),
+            pygame.Rect(0, 690, 1280, 15),
+        ]
+        
+        # Icono del diálogo con la E 
+        self.icono_e = pygame.image.load("game/ui/assets/objetos/icono_e.png").convert_alpha()
+        self.icono_e = pygame.transform.scale(self.icono_e, (32, 32))
+
+        # Tiempo para animación del icono 
+        self.tiempo = 0
+
+        # Puerta de salida (Iniciar siguiente cap)
+        self.puerta_rect = pygame.Rect(560,680, 120, 50)
+
+    # ============================================================
+    # ENTRADA AL CAPÍTULO 1
+    # ============================================================
+    def on_enter(self):
+        self.mostrar_intro_capitulo1()
+
+    # ============================================================
+    # NARRATIVA INICIAL
+    # ============================================================
+    def mostrar_intro_capitulo1(self):
+        self.partida.narrar("MANOLO: ¡Alejandro! La mesa 4 está hecha un desastre.")
+        self.partida.narrar("MANOLO: Anda, límpiala antes de que se me quejen.")
+
+        self.partida.narrar("CONTROLES:")
+        self.partida.narrar("Muévete con W A S D.")
+        self.partida.narrar("Pulsa E para interactuar.")
+        self.partida.narrar("Pulsa ESPACIO o CLICK para continuar los diálogos.")
+        self.partida.narrar("Cuando aparezcan opciones, selecciónalas con ↑ ↓ y confirma con ENTER.")
+
+        self.esperando_mesa4 = True
+
+    # ============================================================
+    # MESA 4 y TUTORIAL
+    # ============================================================
+    def narrativa_mesa4(self):
+        self.partida.narrar("Te acercas a la mesa 4…")
+        self.partida.narrar("Cuatro desconocidos te miran con una sonrisa sospechosa.")
+        self.partida.narrar("BIGOTES: Quillo, ¿tú sabes jugar a esto?")
+        self.partida.narrar("PROTAGONISTA: ¿A qué?")
+        self.partida.narrar("INFORMÁTICO: A esto, criatura. El juego de cartas más famoso del barrio.")
+        self.partida.narrar("POETA: Siéntate, que te enseñamos.")
+        self.partida.narrar("Comienza el tutorial improvisado…")
+
+        self.esperando_mesa4 = False
+        self.mesa4_activada = True
+        self.opciones_tutorial_activas = True
+
+        self.partida.ui.dialogue.text = ("BIGOTES: ¿Quieres que te expliquemos cómo jugar?")
+
+        self.partida.ui.dialogue.set_options([
+            "Explicación de cómo se juega",
+            "Saltar tutorial"
+        ])
+
+    # ============================================================
+    # TUTORIAL COMPLETO
+    # ============================================================
+    def iniciar_tutorial(self):
+        self.mostrando_opciones_tutorial = False
+
+        self.partida.narrar("El objetivo es emborrachar al rival antes de que él te emborrache a ti. Sino estás perdido (Literalmente).")
+        self.partida.narrar("Cada ataque obliga al rival a consumir alcohol y sube la barra de Puntos de Alcohol del rival.")
+        self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
+
+        self.partida.narrar("TIPOS DE CARTAS")
+        self.partida.narrar("ATAQUE → suben barra de Puntos de Alcohol al rival")
+        self.partida.narrar("DEFENSA / CURACIÓN → bajan tu barra de Puntos de Alcohol o evitan recibir daño")
+        self.partida.narrar("ACCIÓN → efectos especiales (robar, esquivar, etc.)")
+        self.partida.narrar("SET → si juntas 3 iguales, activas un COMBO")
+        self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
+
+        self.partida.narrar("ESTADOS")
+        self.partida.narrar("Sobrio (0–40%) → normal")
+        self.partida.narrar("Contentillo (40–70%) → +daño, -precisión")
+        self.partida.narrar("Tocado (70–90%) → +daño recibido, -precisión")
+        self.partida.narrar("Ciego (90–100%) → ataques torpes, riesgo de autoataque")
+        self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
+
+        self.partida.narrar("PRECISIÓN Y CRÍTICOS")
+        self.partida.narrar("Tus ataques pueden fallar según tu estado.")
+        self.partida.narrar("También pueden ser críticos y hacer más daño o provocar autoataques.")
+        self.partida.narrar("[Pulsa CLICK o ESPACIO para continuar]")
+
+        self.partida.narrar("COMBOS")
+        self.partida.narrar("Si juntas 3 cartas de set iguales, puedes activar un combo muy potente.")
+        self.partida.narrar("[Fin del tutorial — pulsa CLICK o ESPACIO]")
+
+    # ============================================================
+    # DISTANCIA
+    # ============================================================
+    def distancia(self, r1, r2):
+        cx1 = r1.x + r1.w // 2
+        cy1 = r1.y + r1.h // 2
+        cx2 = r2.x + r2.w // 2
+        cy2 = r2.y + r2.h // 2
+        return ((cx1 - cx2)**2 + (cy1 - cy2)**2) ** 0.5
+
+    # ============================================================
+    # UPDATE PRINCIPAL
+    # ============================================================
+    def update(self, window, keys):
+        self.tiempo += 0.1
+        pulsando_e = keys[pygame.K_e]
+        nueva_pulsacion_e = pulsando_e and not self.e_pulsado_antes
+
+        # Fondo
+        window.blit(self.fondo, (0, 0))
+
+        # Dibujar puerta
+        # window.blit(self.puerta_img, self.puerta_rect)
+
+        # Movimiento del jugador (solo si no hay menús)
+        old_pos = self.jugador.copy()
+        if not self.mostrando_opciones_tutorial and not self.mostrando_opciones_fin_tutorial:
+            if keys[pygame.K_w]:
+                self.jugador.y -= self.vel
+                self.sprite_actual = self.sprite_espalda
+
+            if keys[pygame.K_s]:
+                self.jugador.y += self.vel
+                self.sprite_actual = self.sprite_frente
+
+            if keys[pygame.K_a]:
+                self.jugador.x -= self.vel
+                self.sprite_actual = self.sprite_izquierda
+
+            if keys[pygame.K_d]:
+                self.jugador.x += self.vel
+                self.sprite_actual = self.sprite_derecha
+
+        # Colisiones
+        for col in self.colisiones:
+            if self.jugador.colliderect(col):
+                self.jugador = old_pos
+                break
+
+        # Dibujar jugador
+        sprite_x = (self.jugador.centerx- self.sprite_actual.get_width() // 2)
+        sprite_y = (self.jugador.bottom- self.sprite_actual.get_height())
+
+        window.blit(self.sprite_actual,(sprite_x, sprite_y))
+        #pygame.draw.rect(window,(255, 0, 0),self.jugador,2) determinar las colisiones con la imagen nueva
+ 
+        # ============================================================
+        # INTERACCIÓN CON LA MESA 4
+        # ============================================================
+        if self.esperando_mesa4 and not self.mesa4_activada and not self.combate_ganado:
+            if self.jugador.colliderect(self.trigger_mesa4):
+                alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
+                icono = self.icono_e.copy()
+                icono.set_alpha(alpha)
+                window.blit(icono, (self.trigger_mesa4.x + 20, self.trigger_mesa4.y - 40))
+
+                if keys[pygame.K_e]:
+                    self.narrativa_mesa4()
+
+        # ============================================================
+        # ACTIVAR MENÚ FINAL DEL TUTORIAL CUANDO EL DIÁLOGO TERMINE
+        # ============================================================
+        dialogo = self.partida.ui.dialogue
+
+        if dialogo.showing_options:
+            if keys[pygame.K_RETURN]:
+                opcion = dialogo.confirm_option()
+
+                if opcion is not None:
+                    # Tutorial
+                    if self.opciones_tutorial_activas:
+                        self.opciones_tutorial_activas = False
+                        if opcion == 0:
+                            self.iniciar_tutorial()
+                           
+                        elif opcion == 1:
+                            self.partida.narrar("BIGOTES: Vale, vale... directo al lío entonces.")
+                            self.partida.narrar("Que empiece la partida.")
+                            self.posicion_pre_combate = (self.jugador.x,self.jugador.y)
+                            return "combate"
+
+
+                    elif self.opciones_fin_tutorial_activas:
+                        self.opciones_fin_tutorial_activas = False
+
+                        if opcion == 0:
+                            self.iniciar_tutorial()
+
+                        elif opcion == 1:
+                            self.partida.narrar("BIGOTES: Pues venga, al lío.")
+                            self.partida.narrar("Que empiece la partida.")
+                            self.posicion_pre_combate = (self.jugador.x,self.jugador.y)
+                            return "combate"
+
+                    elif self.opciones_post_combate_activas:
+                        self.opciones_post_combate_activas = False
+
+                        if opcion == 0:
+                            self.partida.decision_cap1 = "celebrar"
+                            self.partida.narrar("NARRADOR: Decides quedarte celebrando hasta altas horas.")
+                            self.partida.narrar("MANOLO: ¡Jajaja! Ya sabía yo que te ibas a quedar.")
+                            self.partida.narrar("MANOLO: Una noche de fiesta está bien.")
+                            self.partida.narrar("MANOLO: El problema es cuando todas las noches son iguales.")
+                        elif opcion == 1:
+                            self.partida.decision_cap1 = "moderado"
+                            self.partida.narrar("NARRADOR: Tomas algo con los demás antes de marcharte.")
+                            self.partida.narrar("MANOLO: Buena elección.")
+                            self.partida.narrar("MANOLO: Hay tiempo para celebrar y tiempo para descansar.")
+                        elif opcion == 2:
+                            self.partida.decision_cap1 = "descansar"
+                            self.partida.narrar("NARRADOR: Prefieres volver a casa y descansar.")
+                            self.partida.narrar("MANOLO: Veo que piensas a largo plazo.")
+                            self.partida.narrar("MANOLO: Descansar también forma parte del entrenamiento.")
+                        self.esperando_dialogo_decision = True
+
+        if self.mesa4_activada and not dialogo.showing_options:
+            if not dialogo.visible and len(dialogo.queue) == 0:
+                self.mesa4_activada = False
+                dialogo.visible = True
+                dialogo.text = ("BIGOTES: ¿Quieres repasar el tutorial o empezamos el combate?")
+
+                dialogo.set_options([
+                    "Repetir tutorial",
+                    "Empezar combate"
+                ])
+                self.opciones_fin_tutorial_activas = True
+
+        # ============================================================
+        # ESPERAR A QUE TERMINEN LOS DIÁLOGOS DE LA DECISIÓN
+        # ============================================================
+        if self.esperando_dialogo_decision:
+            if not dialogo.visible and len(dialogo.queue) == 0:
+                self.esperando_dialogo_decision = False
+                self.escena_manolo()
+
+        # ============================================================
+        # POST-COMBATE Y ESPERAR A QUE ACABEN LOS DIÁLOGOS
+        # ============================================================
+        if self.post_combate:
+            if not dialogo.visible and len(dialogo.queue) == 0:
+                self.post_combate = False
+                self.opciones_post_combate_activas = True
+
+                self.partida.ui.dialogue.visible = True
+                self.partida.ui.dialogue.text = (
+                    "MANOLO: ¿Cómo quieres celebrar la victoria?"
+                )
+
+                self.partida.ui.dialogue.set_options([
+                    "Quedarme hasta tarde celebrando",
+                    "Tomar algo y volver a casa",
+                    "Irme directamente a descansar"
+                ])
+
+        # ============================================================
+        # INTERACCIÓN CON LA PUERTA Y POR TANTO, INICIAR EL CAPÍTULO 2
+        # ============================================================
+        if not self.post_combate:
+            if self.distancia(self.jugador, self.puerta_rect) < 70:
+                alpha = int((math.sin(self.tiempo * 4) + 1) * 127)
+                icono = self.icono_e.copy()
+                icono.set_alpha(alpha)
+                window.blit(icono, (self.puerta_rect.x + 20, self.puerta_rect.y - 40))
+
+                if nueva_pulsacion_e:
+                    if not self.combate_ganado:
+                        self.partida.narrar("NARRADOR: Antes de marcharte deberías terminar lo que has venido a hacer.")
+                        self.partida.narrar("NARRADOR: La mesa 4 sigue esperando.")
+                    else:
+                        self.partida.narrar("NARRADOR: Sales de la taberna mientras la noche sevillana te envuelve.")
+                        self.partida.narrar("NARRADOR: El eco de las risas, las cartas y los brindis queda atrás…")
+                        self.partida.narrar("NARRADOR: …y sin saberlo, das el primer paso hacia una aventura mucho más grande.")
+                        self.partida.narrar("NARRADOR: FIN DEL CAPÍTULO 1.")
+                        return "capitulo2"
+                    self.e_pulsado_antes = pulsando_e
+        return None
+
+    # ====================================
+    # REINICIO DEL COMBATE TRAS PERDER
+    # ====================================
+    def reiniciar_tras_derrota(self):
+        self.post_combate = False
+        self.mesa4_activada = False
+        self.esperando_mesa4 = True
+        self.opciones_tutorial_activas = False
+        self.opciones_post_combate_activas = False
+        self.opciones_fin_tutorial_activas = False
+        self.esperando_dialogo_decision = False
+
+        if self.posicion_pre_combate:
+            self.jugador.x = self.posicion_pre_combate[0]
+            self.jugador.y = self.posicion_pre_combate[1]
+
+        # Partida limpia desde 0
+        self.partida = Partida(capitulo=1)
+
+    # ====================================
+    # DIALOGOS TRAS PERDER
+    # ====================================
+    def mostrar_dialogo_derrota(self):
+
+        self.partida.narrar("NARRADOR: Abres los ojos con la cabeza dándote vueltas.")
+        self.partida.narrar("NARRADOR: Lo último que recuerdas son las luces azules de una ambulancia camino del hospital.")
+        self.partida.narrar("MANOLO: Alejandro, chiquillo... menuda noche nos has dado.")
+        self.partida.narrar("MANOLO: Has tenido suerte. Un susto así le puede pasar a cualquiera.")
+        self.partida.narrar("MANOLO: Pero perder una partida no es grave. Perder el control de lo que bebes sí puede serlo.")
+        self.partida.narrar("BIGOTES: Las cartas siempre dan revancha.")
+        self.partida.narrar("POETA: La salud no siempre concede una segunda oportunidad con tanta facilidad.")
+        self.partida.narrar("INFORMÁTICO: Conocer tus límites también forma parte del juego.")
+        self.partida.narrar("MANOLO: Venga, respira hondo. Cuando estés listo, vuelve a intentarlo.")
+
+    # ============================================================
+    # FIN DEL COMBATE
+    # ============================================================
+    def on_fin_combate(self, resultado):
+
+        if resultado == "victoria":
+            self.combate_ganado = True
+            self.partida.narrar("BIGOTES: ¡Ole ahí! Les has dado una paliza, criatura.")
+            self.partida.narrar("POETA: Niño, tienes talento. El arte te corre por las venas.")
+            self.partida.narrar("INFORMÁTICO: Te has ganado una ronda gratis… y mi respeto, que es más difícil.")
+            self.partida.narrar("BIGOTES: Escúchame, Alejandro… no todo el mundo aprende tan rápido.")
+            self.partida.narrar("POETA: El duende del cartón te acompaña, muchacho.")
+            self.partida.narrar("INFORMÁTICO: Y hablando de duendes… ¿has oído hablar del 'Gallito'?")
+            self.partida.narrar("BIGOTES: Ese tío es una leyenda. Juega en la Peña del Gallo Rojo, ahí al lado del puente.")
+            self.partida.narrar("POETA: Dicen que nunca ha perdido un duelo… o que cuando pierde, nadie vive pa’ contarlo.")
+            self.partida.narrar("INFORMÁTICO: Si quieres mejorar, deberías ir a verlo. Igual te enseña algo… o te revienta.")
+            self.partida.narrar("BIGOTES: Pero no hoy. Hoy disfruta. Que lo que viene es gordo.")
+            self.partida.narrar("MANOLO: ¡Alejandro! Cuando termines con estos, acércate a la barra. Tengo que pedirte un favor importante.")
+            self.partida.narrar("NARRADOR: Algo se mueve en Sevilla… y tú estás en medio sin saberlo.")
+
+        self.post_combate = True
+        self.mesa4_activada = False
+
+    # ============================================================
+    # DIÁLOGOS DE MANOLO COMO MENTOR
+    # ============================================================
+    def escena_manolo(self):
+        p = self.partida.narrar
+
+        p("MANOLO: Ven pa'cá, Alejandro. Siéntate un momento conmigo.")
+        p("MANOLO: Mira, hijo… hoy has vivido tu primer duelo de verdad.")
+        p("MANOLO: Y te voy a decir una cosa: aquí en Sevilla, el juego de cartas no es solo un pasatiempo.")
+        p("MANOLO: Es orgullo. Es tradición. Es… bueno, también es una excusa pa' beber, pero tú me entiendes.")
+
+        p("MANOLO: Los del barrio ya han empezado a hablar de ti.")
+        p("MANOLO: Que si el chaval nuevo tiene arte… que si apunta maneras… que si tiene más peligro que un cubata mal hecho.")
+        p("MANOLO: Y eso, Alejandro, es bueno. Muy bueno.")
+
+        p("MANOLO: Pero escucha… también significa que te van a empezar a buscar.")
+        p("MANOLO: Retadores. Gente que quiere medirse contigo. Gente que quiere demostrar que son mejores.")
+        p("MANOLO: Y tú tienes que estar preparado.")
+
+        p("MANOLO: Mañana, pásate por la Peña del Gallo Rojo.")
+        p("MANOLO: Allí se junta gente seria. Jugadores de verdad.")
+        p("MANOLO: Y si quieres seguir creciendo… ese es tu sitio.")
+
+        p("MANOLO: Pero por hoy ya está bien. Estás cansado, y se te nota en la cara.")
+        p("MANOLO: Vete pa' casa, descansa, y mañana empieza lo bueno.")
+
