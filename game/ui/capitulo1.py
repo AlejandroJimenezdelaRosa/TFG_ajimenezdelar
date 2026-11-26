@@ -7,15 +7,8 @@ class Capitulo1:
         # ===================
         # FONDO DEL CAPÍTULO
         # ===================
-        self.fondo = pygame.image.load(
-            "game/ui/assets/escenarios/capitulo1.png"
-        ).convert()
-
-        self.fondo = pygame.transform.scale(
-            self.fondo,
-            (1280, 720)
-        )
-
+        self.fondo = pygame.image.load("game/ui/assets/escenarios/capitulo1.png").convert()
+        self.fondo = pygame.transform.scale(self.fondo,(1280, 720))
         self.trigger_mesa4 = pygame.Rect(760,360,170,150)
 
         # ========
@@ -52,11 +45,8 @@ class Capitulo1:
         # ========
         self.jugador = pygame.Rect(624, 336, 32, 48)
         self.sprite_frente = pygame.image.load("game/ui/assets/personajes/protagonista/frente.png").convert_alpha()
-
         self.sprite_espalda = pygame.image.load("game/ui/assets/personajes/protagonista/espalda.png").convert_alpha()
-
         self.sprite_izquierda = pygame.image.load("game/ui/assets/personajes/protagonista/izquierda.png").convert_alpha()
-
         self.sprite_derecha = pygame.image.load("game/ui/assets/personajes/protagonista/derecha.png").convert_alpha()
         self.vel = 4
         self.post_combate = False
@@ -75,35 +65,29 @@ class Capitulo1:
         self.colisiones = [
             # Cocina + barra
             pygame.Rect(21,0,449,380),
-
             # Barra y zona de servicio
             pygame.Rect( 474,0,786,307),
-
             # Superior izquierda
             pygame.Rect(70, 425, 110, 70),
-
             # Superior centro izquierda
             pygame.Rect(265, 425, 110, 70),
-
             # Superior derecha
             pygame.Rect(1025, 425, 110, 70),
-
             # Inferior izquierda
             pygame.Rect(80, 560, 110, 70),
-
             # Inferior centro izquierda
             pygame.Rect(285, 560, 110, 70),
-
             # Inferior derecha
             pygame.Rect(1025, 560, 110, 70),
-
             pygame.Rect(1170,575,50,80),
-
             # Mesa inferior central
             pygame.Rect(800,570,110,70),
-
             # Mesa 4
             pygame.Rect(790,410,120,80),
+            # Paredes
+            pygame.Rect(0, 0, 30, 720),
+            pygame.Rect(1250, 0, 30, 720),
+            pygame.Rect(0, 690, 1280, 15),
         ]
         
         # Icono del diálogo con la E 
@@ -241,20 +225,10 @@ class Capitulo1:
                 break
 
         # Dibujar jugador
-        sprite_x = (
-            self.jugador.centerx
-            - self.sprite_actual.get_width() // 2
-        )
+        sprite_x = (self.jugador.centerx- self.sprite_actual.get_width() // 2)
+        sprite_y = (self.jugador.bottom- self.sprite_actual.get_height())
 
-        sprite_y = (
-            self.jugador.bottom
-            - self.sprite_actual.get_height()
-        )
-
-        window.blit(
-            self.sprite_actual,
-            (sprite_x, sprite_y)
-        )
+        window.blit(self.sprite_actual,(sprite_x, sprite_y))
         #pygame.draw.rect(window,(255, 0, 0),self.jugador,2) determinar las colisiones con la imagen nueva
  
         # ============================================================
@@ -285,19 +259,11 @@ class Capitulo1:
                         self.opciones_tutorial_activas = False
                         if opcion == 0:
                             self.iniciar_tutorial()
-                            
+                           
                         elif opcion == 1:
-                            self.partida.narrar(
-                                "BIGOTES: Vale, vale... directo al lío entonces."
-                            )
-
-                            self.partida.narrar(
-                                "Que empiece la partida."
-                            )
-                            self.posicion_pre_combate = (
-                                self.jugador.x,
-                                self.jugador.y
-                            )
+                            self.partida.narrar("BIGOTES: Vale, vale... directo al lío entonces.")
+                            self.partida.narrar("Que empiece la partida.")
+                            self.posicion_pre_combate = (self.jugador.x,self.jugador.y)
                             return "combate"
 
 
@@ -305,22 +271,12 @@ class Capitulo1:
                         self.opciones_fin_tutorial_activas = False
 
                         if opcion == 0:
-
                             self.iniciar_tutorial()
 
                         elif opcion == 1:
-                            self.partida.narrar(
-                                "BIGOTES: Pues venga, al lío."
-                            )
-
-                            self.partida.narrar(
-                                "Que empiece la partida."
-                            )
-
-                            self.posicion_pre_combate = (
-                                self.jugador.x,
-                                self.jugador.y
-                            )
+                            self.partida.narrar("BIGOTES: Pues venga, al lío.")
+                            self.partida.narrar("Que empiece la partida.")
+                            self.posicion_pre_combate = (self.jugador.x,self.jugador.y)
                             return "combate"
 
                     elif self.opciones_post_combate_activas:
@@ -328,51 +284,20 @@ class Capitulo1:
 
                         if opcion == 0:
                             self.partida.decision_cap1 = "celebrar"
-                            self.partida.narrar(
-                                "NARRADOR: Decides quedarte celebrando hasta altas horas."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: ¡Jajaja! Ya sabía yo que te ibas a quedar."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: Una noche de fiesta está bien."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: El problema es cuando todas las noches son iguales."
-                            )
-
+                            self.partida.narrar("NARRADOR: Decides quedarte celebrando hasta altas horas.")
+                            self.partida.narrar("MANOLO: ¡Jajaja! Ya sabía yo que te ibas a quedar.")
+                            self.partida.narrar("MANOLO: Una noche de fiesta está bien.")
+                            self.partida.narrar("MANOLO: El problema es cuando todas las noches son iguales.")
                         elif opcion == 1:
                             self.partida.decision_cap1 = "moderado"
-
-                            self.partida.narrar(
-                                "NARRADOR: Tomas algo con los demás antes de marcharte."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: Buena elección."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: Hay tiempo para celebrar y tiempo para descansar."
-                            )
-
+                            self.partida.narrar("NARRADOR: Tomas algo con los demás antes de marcharte.")
+                            self.partida.narrar("MANOLO: Buena elección.")
+                            self.partida.narrar("MANOLO: Hay tiempo para celebrar y tiempo para descansar.")
                         elif opcion == 2:
                             self.partida.decision_cap1 = "descansar"
-
-                            self.partida.narrar(
-                                "NARRADOR: Prefieres volver a casa y descansar."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: Veo que piensas a largo plazo."
-                            )
-
-                            self.partida.narrar(
-                                "MANOLO: Descansar también forma parte del entrenamiento."
-                            )
+                            self.partida.narrar("NARRADOR: Prefieres volver a casa y descansar.")
+                            self.partida.narrar("MANOLO: Veo que piensas a largo plazo.")
+                            self.partida.narrar("MANOLO: Descansar también forma parte del entrenamiento.")
                         self.esperando_dialogo_decision = True
 
         if self.mesa4_activada and not dialogo.showing_options:
@@ -425,11 +350,15 @@ class Capitulo1:
                 window.blit(icono, (self.puerta_rect.x + 20, self.puerta_rect.y - 40))
 
                 if keys[pygame.K_e]:
-                    self.partida.narrar("NARRADOR: Sales de la taberna mientras la noche sevillana te envuelve.")
-                    self.partida.narrar("NARRADOR: El eco de las risas, las cartas y los brindis queda atrás…")
-                    self.partida.narrar("NARRADOR: …y sin saberlo, das el primer paso hacia una aventura mucho más grande.")
-                    self.partida.narrar("NARRADOR: FIN DEL CAPÍTULO 1.")
-                    return "capitulo2"
+                    if not self.combate_ganado:
+                        self.partida.narrar("NARRADOR: Antes de marcharte deberías terminar lo que has venido a hacer.")
+                        self.partida.narrar("NARRADOR: La mesa 4 sigue esperando.")
+                    else:
+                        self.partida.narrar("NARRADOR: Sales de la taberna mientras la noche sevillana te envuelve.")
+                        self.partida.narrar("NARRADOR: El eco de las risas, las cartas y los brindis queda atrás…")
+                        self.partida.narrar("NARRADOR: …y sin saberlo, das el primer paso hacia una aventura mucho más grande.")
+                        self.partida.narrar("NARRADOR: FIN DEL CAPÍTULO 1.")
+                        return "capitulo2"
         return None
 
     # ====================================

@@ -45,9 +45,13 @@ class Capitulo2:
         # POSICIONES DE LAS COLISIONES
         # ===========v===================
         self.colisiones = [
-            pygame.Rect(20, 20, 630, 320),
+            pygame.Rect(20, 20, 680, 320),
             pygame.Rect(30, 510, 400, 180),
             pygame.Rect(710, 20, 520, 650),
+            # Paredes
+            pygame.Rect(0, 0, 30, 720),
+            pygame.Rect(1250, 0, 30, 720),
+            pygame.Rect(0, 690, 1280, 30),
         ]
 
         # ==================
